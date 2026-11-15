@@ -1,0 +1,60 @@
+================================================================================
+DevOps Problem Analysis & Solution Justification
+Project: Automated CI Pipeline & Playwright E2E Test Suite
+Author: Egor Zvyagin (github.com/egor-zvyagin)
+================================================================================
+
+1. ANALYSIS OF THE PROBLEM (What are you trying to solve?)
+--------------------------------------------------------------------------------
+YeetCode has a simple notes app built with Node, Express, and MongoDB, but 
+their release process is a mess. Here are the main problems I'm solving:
+
+• Everything depends on Pete's laptop:
+  - Pete is the only person who knows how to build and deploy the app, and he 
+    does it all manually from his own computer.
+  - When Pete took time off recently, the company couldn't ship anything and 
+    missed a huge release for a major client, which lost them money and trust.
+
+• Deploying by hand is messy and unreliable:
+  - Passing around zip files and running manual terminal commands is super easy 
+    to mess up.
+  - It creates "it worked on my machine" issues where production doesn't match 
+    Pete's local setup.
+
+• Zero automated testing before code goes live:
+  - Nobody was running tests or lint checks before shipping code.
+  - Simple bugs—like missing database fields or syntax errors—went unnoticed 
+    and got pushed straight into production.
+
+• Overworked team and annoyed customers:
+  - Users ran into broken features and flooded support with complaints.
+  - Developers and support staff had to work overtime putting out fires, 
+    which stressed everyone out and crushed team morale.
+
+
+2. EXPLAIN AND JUSTIFY THE SOLUTION (How does the solution work?)
+--------------------------------------------------------------------------------
+To fix these issues, I replaced Pete's manual setup with an automated CI pipeline 
+in GitHub Actions using GitHub Flow. Here is how it works:
+
+• Moved off Pete's laptop to GitHub Actions:
+  - The build now runs in the cloud on fresh Ubuntu runners instead of Pete's machine.
+  - It triggers automatically whenever anyone pushes code or opens a PR on any branch.
+  - If Pete is on leave, anyone on the team can still test and ship without issues.
+
+• Automated checks catch bugs right away:
+  - Linting (ESLint): Catches bad syntax and unused variables (we found and removed an unused Note import in note.test.js).
+  - Unit tests + Coverage (Jest): Checks Note model validation rules and ensures 100% coverage (we fixed an empty description bug in model.note.test.js that broke Mongoose validation).
+  - E2E testing (Playwright + MongoDB): Spins up a real MongoDB container in the runner, opens real browsers (Chrome, Firefox, Safari/WebKit), and clicks around creating and deleting notes to make sure the whole app actually works from the UI.
+  - Resolving environment bugs: We bumped Playwright to 1.45 to run on modern Ubuntu 24.04, configured webServer to auto-launch the app, and resolved locator collisions.
+  - Fails fast: If any test fails, the build stops immediately and logs the error, so broken code never slips through.
+
+• GitHub Flow instead of committing to main:
+  - Nobody pushes directly to `main` anymore.
+  - All work happens on feature branches and goes through Pull Requests.
+  - All automated tests have to pass green before anything can be merged into `main`.
+
+• Deployable artifacts are only created on main:
+  - Feature branches are strictly for testing, so they don't produce any deployable files.
+  - A clean deployable package (tar.gz) is only created and uploaded once code merges 
+    into `main`, so we only ever deploy tested, production-ready code.
