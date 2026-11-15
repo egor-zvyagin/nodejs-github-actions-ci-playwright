@@ -1,2 +1,8 @@
 node_modules/
-
+src/coverage/
+src/playwright-report/
+src/test-results/
+src/junit.xml
+*.tar.gz
+.env
+.DS_Store

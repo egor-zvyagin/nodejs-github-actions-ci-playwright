@@ -9,11 +9,11 @@ on:
 jobs:
   ci:
     name: Build, Lint, Test & Package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     services:
       mongodb:
-        image: mongo:latest
+        image: mongo:6.0
         ports:
           - 27017:27017
 
@@ -71,4 +71,3 @@ jobs:
         with:
           name: deployable-build-artifact
           path: deployable-artifact.tar.gz
-

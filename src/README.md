@@ -1,97 +1,99 @@
-# Notes App with MongoDB, Express.js and Node.js
+# Notes Application — Node.js, Express & MongoDB
 
-The Notes app uses the following technologies and javascript libraries:
-```bash
-$ node --version
-v17.6.0
+A lightweight, production-ready web application demonstrating test-driven architecture, containerized integration testing, and automated multi-browser End-to-End (E2E) testing.
 
-$ npm list
-notes
-├── dotenv@16.0.0
-├── ejs@3.1.6
-├── eslint-config-standard@16.0.3
-├── eslint-plugin-import@2.25.4
-├── eslint-plugin-node@11.1.0
-├── eslint-plugin-promise@6.0.0
-├── eslint@8.11.0
-├── expect.js@0.3.1
-├── express@4.17.3
-├── jest-junit@13.0.0
-├── jest@27.5.1
-├── method-override@3.0.0
-├── mockingoose@2.15.2
-├── mongoose@6.2.6
-└── supertest@6.2.2
-```
+## Tech Stack & Core Libraries
 
-## What are the features?
-The Notes app lets you add new notes and delete notes. The data is stored in MongoDB (via mongoose)
-
-# How to use
-
-**NOTE: All commands listed here are issued from the root directory.**
-
-To run this application locally you need to have an instance of MongoDB running.
-
-An `.env` file has been provided, that lets the Notes app know where to access the database.
-
-To install the dependencies:
-```
-npm install --prefix src
-```
-
-To start the application:
-```
-npm run start --prefix src
-```
-
-The application can be accessed in a browser at: `localhost:3000`
-
-## Testing
-
-**NOTE: Use a comparison tool (like Beyond Compare) to ensure you have the latest version of this repo**
-
-Four testing routines have been included as part of this application:
-- Static Code Analysis / Linting (uses `eslint`)
-- Unit Testing Models (uses `jest`)
-- Integration Testing (uses `jest`)
-- E2E (End to End) Testing (uses `playwright`)
-
-### Static Code Analysis / Linting
-Static Code Analysis and Linting is run across the code base.
-
-```
-npm run test-lint --prefix src
-```
-
-### Unit Testing
-
-Unit Tests are run on the models for each object stored in MongoDB.
-This validates the models and ensures that required data is entered.
-Run unit testing with the following command:
-
-```
-npm run test-unit --prefix src
-```
-
-### Integration Testing
-
-*Note: MongoDB needs to be running for testing to work*
-
-Integration testing is included to ensure the application can talk to the MongoDB Backend:
-Run integration testing with the following command:
-
-```
-npm run test-integration --prefix src
-```
-
-### E2E Testing
-
-E2E Testing is included to ensure that the website operates as it should from the users perspective.
-We use a tool called `playwright`, which loads the website in 3 different browsers and it programmatically clicks on the user interface to make sure the website does what is expected.
-
-Refer to https://playwright.dev/docs/ci for the GitHub Actions script you will need.
+- **Runtime:** Node.js (>= 18.x) & Express.js 4.x
+- **Persistence:** MongoDB 6.x via Mongoose 6.x ORM
+- **Template Engine:** EJS (Embedded JavaScript Templates)
+- **Code Quality & Linting:** ESLint 8.x (Standard config)
+- **Unit & Integration Testing:** Jest 27.x, Supertest 6.x, Mockingoose 2.x
+- **End-to-End (E2E) Testing:** Playwright 1.45+ (Chromium, Firefox, WebKit)
+- **CI/CD:** GitHub Actions with containerized MongoDB services
 
 ---
 
-###### This project is licensed under the MIT Open Source License
+## Application Features
+
+- **Note Management:** Create, list, view, and delete rich text notes.
+- **Data Validation:** Strict schema enforcement on note title, body, and timestamp attributes.
+- **RESTful Routing:** Express HTTP handlers with REST conventions and method-override support.
+- **Resilient Connectivity:** Configurable database connection strings via environment variables (`.env`).
+
+---
+
+## Local Development & Setup
+
+### 1. Prerequisites
+Ensure you have the following installed:
+- Node.js (v18.x or v20.x recommended)
+- MongoDB running locally on `localhost:27017` or via Docker:
+  ```bash
+  docker run -d -p 27017:27017 --name mongodb mongo:6.0
+  ```
+
+### 2. Dependency Installation
+Install project dependencies from the repository root:
+```bash
+npm install --prefix src
+```
+
+### 3. Environment Configuration
+An example `.env` file is located in `src/.env`:
+```ini
+PORT=3000
+SERVER=mongodb://127.0.0.1:27017
+```
+
+### 4. Running the Application
+Start the Node.js server:
+```bash
+npm run start --prefix src
+```
+Access the application in your browser at `http://localhost:3000`.
+
+---
+
+## Automated Test Suites
+
+The repository implements a comprehensive test pyramid to guarantee software reliability across layers:
+
+### 1. Static Code Analysis (ESLint)
+Enforces syntax consistency and detects unused dependencies or unsafe operations:
+```bash
+npm run test:lint --prefix src
+```
+
+### 2. Unit Testing & Model Coverage (Jest)
+Validates Mongoose schema constraints, model validation rules, and business logic:
+```bash
+npm run test:unit --prefix src
+```
+
+### 3. Integration Testing (Supertest + MongoDB)
+Tests Express route handlers, database queries, and HTTP status codes against a live database:
+```bash
+npm run test:integration --prefix src
+```
+
+### 4. End-to-End (E2E) Browser Testing (Playwright)
+Simulates realistic user journeys (creating and deleting notes) across all major browser engines (Chromium, Firefox, and WebKit):
+```bash
+# First-time setup: install browser binaries
+npx playwright install --with-deps
+
+# Run end-to-end test suite
+npm run test:e2e --prefix src
+```
+
+---
+
+## Continuous Integration Pipeline
+
+The automated CI workflow (`.github/workflows/ci-pipeline.yml`) executes on every push and pull request:
+1. Provisions an Ubuntu 22.04 LTS virtual runner with a containerized MongoDB 6.0 service.
+2. Runs ESLint static analysis.
+3. Executes Jest unit and integration tests with coverage assertion.
+4. Boots the local server and runs Playwright across Chromium, Firefox, and WebKit.
+5. Packages a deployable tarball (`deployable-artifact.tar.gz`) on green builds merged to `main`.
